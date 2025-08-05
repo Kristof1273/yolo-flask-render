@@ -7,7 +7,19 @@ import os
 app = Flask(__name__)
 model = YOLO("model.pt")  # Győződj meg róla, hogy a fájl a gyökérkönyvtárban van
 
-
+@app.route("/")
+def home():
+    return """
+    <html>
+        <head>
+            <title>YOLO Flask App</title>
+        </head>
+        <body style="text-align:center; font-family:sans-serif; margin-top:50px;">
+            <h1>✅ YOLO Flask app is running!</h1>
+            <p>Az API működik, készen áll képek fogadására.</p>
+        </body>
+    </html>
+    """
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -23,21 +35,6 @@ def predict():
 
     results = model(img)
     return jsonify(results[0].tojson())
-
-@app.route("/")
-def home():
-    return """
-    <html>
-        <head>
-            <title>YOLO Flask App</title>
-        </head>
-        <body style="text-align:center; font-family:sans-serif; margin-top:50px;">
-            <h1>✅ YOLO Flask app is running!</h1>
-            <p>Az API működik, készen áll képek fogadására.</p>
-        </body>
-    </html>
-    """
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
