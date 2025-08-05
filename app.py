@@ -7,9 +7,7 @@ import os
 app = Flask(__name__)
 model = YOLO("model.pt")  # Győződj meg róla, hogy a fájl a gyökérkönyvtárban van
 
-@app.route("/")
-def home():
-    return "🦾 YOLO Flask app is running!"
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
