@@ -29,3 +29,18 @@ def predict():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
+
+@app.route("/")
+def home():
+    return """
+    <html>
+        <head>
+            <title>YOLO Flask App</title>
+        </head>
+        <body style="text-align:center; font-family:sans-serif; margin-top:50px;">
+            <h1>✅ YOLO Flask app is running!</h1>
+            <p>Az API működik, készen áll képek fogadására.</p>
+        </body>
+    </html>
+    """
