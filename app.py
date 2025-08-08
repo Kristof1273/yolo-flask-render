@@ -23,18 +23,30 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    if "image" not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
+    try:
+        if "image" not in request.files:
+            return jsonify({"error": "No image uploaded"}), 400
 
-    file = request.files["image"]
-    img_bytes = file.read()
-    img = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
+        file = request.files["image"]
+        img_bytes = file.read()
+        img = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
+
+        if img is None:
+            return jsonify({"error": "Invalid image"}), 400
+
+        results = model(img)
+        return results[0].tojson(), 200, {"Content-Type": "application/json"}
+
+    except Exception as e:
+        print(f"Server error: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+
 
     if img is None:
         return jsonify({"error": "Invalid image"}), 400
 
     results = model(img)
-    return jsonify(results[0].tojson())
+    return results[0].tojson(), 200, {"Content-Type": "application/json"}
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
