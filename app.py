@@ -5,7 +5,13 @@ import cv2
 import os
 
 app = Flask(__name__)
-model = YOLO("model.pt")  # Győződj meg róla, hogy a fájl a gyökérkönyvtárban van
+
+try:
+    model = YOLO("model.pt")
+    print("✅ Model loaded successfully")
+except Exception as e:
+    print(f"❌ Model loading failed: {e}")
+
 
 @app.route("/")
 def home():
@@ -24,21 +30,33 @@ def home():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        print("🔍 Request received")
+
         if "image" not in request.files:
+            print("⚠️ No image found in request")
             return jsonify({"error": "No image uploaded"}), 400
 
         file = request.files["image"]
+        print(f"📦 File received: {file.filename}")
+
         img_bytes = file.read()
         img = cv2.imdecode(np.frombuffer(img_bytes, np.uint8), cv2.IMREAD_COLOR)
 
         if img is None:
+            print("❌ Failed to decode image")
             return jsonify({"error": "Invalid image"}), 400
 
+        print("✅ Image decoded, running model...")
         results = model(img)
-        return results[0].tojson(), 200, {"Content-Type": "application/json"}
+
+        print("📊 Model inference done")
+        json_result = results[0].tojson()
+        print(f"📄 JSON result: {json_result[:100]}...")  # csak az első 100 karakter
+
+        return json_result, 200, {"Content-Type": "application/json"}
 
     except Exception as e:
-        print(f"Server error: {e}")
+        print(f"🔥 Exception occurred: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 
